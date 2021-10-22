@@ -1,0 +1,274 @@
+/* Main Containers */
+body, button {
+  font-family: VT323;
+}
+button {
+  font-size: xx-large;
+}
+
+.outer-container {
+  height: 720px;
+  width: 1280px;
+  background: #eee;
+  border: 5px solid gainsboro;
+}
+
+.game-window {
+  height: 720px;
+  width: 1280px;
+  float: left;
+  position: relative;
+  z-index: 0;
+  align-items: center;
+  text-align: center;
+}
+
+/* Main Menu */
+
+.landing-page {
+  visibility: visible;
+  position: relative;
+  background-image: url(../src/frontpage_background.jpg);
+  background-size: contain;
+  z-index: -1;
+}
+
+.landing-header {
+  position: absolute;
+  top: 0%;
+  width: 100%;
+  height: 100px;
+  text-align: center;  
+  background-color: #800;
+  border-bottom: 6px;
+  border-bottom-style: groove;
+  font-size: 100px;
+}
+
+.landing-buttons {
+  display: flex;
+  position: relative;
+  clear: left;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: center;
+  z-index: -1;
+} 
+
+#landing-button {
+  position: relative;
+  width: 200px;
+  height: 100px;
+  background-color: #A00;
+  font-size: 40px;
+  text-align: center;
+  margin: 10px;
+  z-index: -1;
+}
+
+/* Settings change display to flex*/
+.settings-popup {
+  position: absolute;
+  display: none;
+  visibility: visible;
+  background-color: blue;
+  width: 50%;
+  height: 97%;
+  z-index: 10;
+  border: 2px solid;
+  border-color: yellow;
+  text-align: center;
+  align-items: center;
+  top: 10px;
+  left: 25%;
+}
+
+.settings-info > div {
+  font-size: 50px;
+  color: white;
+  margin-bottom: 70px;
+}
+
+/* The slider itself */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  background: #d3d3d3;
+  outline: none;
+  transition: opacity .2s;
+  opacity: 0.7;
+  width: 80%;
+  height: 25px;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.difficulty-levels {
+  display: flex;
+  flex-direction: row;
+  margin: 10px;
+}
+
+.difficulty-levels > button {
+  width: 200px;
+  height: 100px;
+  background-color: #A00;
+  /* border color for selected difficulty: ‘yellow’ */
+  font-size: 40px;
+  margin: 3px;
+}
+
+#close-button {
+  width: 200px;
+  height: 100px;
+  background-color: #A00;
+  font-size: 40px;
+}
+
+.settings-info {
+  display: flex;
+  flex-direction: column;
+
+}
+
+/* Tutorial */
+.tutorial {
+  visibility: hide;
+  display: none;
+  font-size: 50px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tutorial > h1 {
+  font-size: 75px;
+  font-weight: bold;
+}
+
+#asteroid-tut {
+  width: 100px; 
+  height:100px;
+}
+
+#mask-tut {
+  width: 150px;
+  height: 70px;
+}
+
+#vacc-tut {
+  width: 100px;
+  height: 100px;
+}
+
+#start-tut {
+  width: 20%;
+  text-align: center;
+}
+  
+/* Game Section --- Right Section */
+
+#actual_game{
+    visibility: hide;
+    display: none;
+    height: 720px;
+    width: 1280px;
+    background-color: black;
+    z-index: 10;
+    right: 0px;
+    top: 0px;
+    align-items: center;
+    justify-content: center;
+}
+
+.splashScreen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 50px;
+  height: 100%;
+}
+.splashScreen > div{
+  margin: 15px;
+}
+
+#get-ready {
+  font-size: 75px;
+  color: white;
+  font-weight: bold;
+}
+
+#game_right_section {
+    height: 600px;
+    width: 320px;
+    position: absolute;
+    left: 960px;
+    top: 0px;
+    color: white;
+    z-index: 1;
+}
+
+#scoreword, #covid_danger, #level {
+  text-align:center;
+  font-size: 60px;
+}
+
+#score_num, #covid_danger_num, #covid_level {
+  text-align: center;
+  font-size: 40px;
+  color: yellow;
+}
+
+.person {
+  display: inline-block;
+  position: absolute; 
+  width: 62px;
+  /* left: 600px;
+  top: 300px; */
+  z-index: 5;
+  /* height: 100px; */
+}
+
+/* #person > img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+/* #player {
+  position: relative; 
+  z-index: 40;
+  text-align: center;
+  display: block;
+} */
+
+/* game over page */
+.game-over-page {
+  /* visibility: hide; */
+  position: relative;
+  background-image: url(../src/frontpage_background.jpg);
+  background-size: contain;
+  z-index: -1;
+}

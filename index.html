@@ -1,0 +1,127 @@
+<html>
+
+<title>Avoid Covid</title>
+
+<!-- JS -->
+<script src='scripts/jquery.min.js'></script>
+<script src='scripts/page.js'></script>
+
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" href="style/index.css">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+<!-- HTML -->
+<body>
+  <div class='outer-container'>
+      <div class='game-window'>
+        
+        <div class='landing-page'>
+          <!-- Main Menu -->
+          <div class='landing-header'> Covid Comets </div>
+          <div class='landing-buttons'>
+            <button type="button" id='landing-button' onClick='showPlayGame()'> 
+              Play Game! 
+            </button>
+            <button type='button' id='landing-button' onClick='showSettings()'> 
+              Settings 
+            </button>
+          </div> <!-- end landing-buttons -->
+        </div> <!-- end landing-page-->
+
+        <!-- Settings -->
+        <div class="settings-popup">
+          <div class='settings-info'>
+            <div>Settings</div>
+            <div> Volume: <span id="setVol"></span>
+              <div class="volume-slide">
+                <input type="range" min="1" max="100" value="50" class="slider" id="vol-range">
+              </div>
+              <script>
+                var slider = document.getElementById("vol-range");
+                var output = document.getElementById("setVol");
+                volLev = slider.value;
+                output.innerHTML = slider.value;
+                slider.oninput = function() {
+                  output.innerHTML = this.value;
+                }
+              </script>
+            </div>
+            <div> Difficulty </br>
+              <div class='difficulty-levels'>
+                <button type='button' id='diff-easy' onClick='setDiff("easy")'> 
+                  Easy 
+                </button>
+                <button type='button' id='diff-normal' onClick='setDiff("normal")'> 
+                  Normal 
+                </button>
+                <button type='button' id='diff-hard' onClick='setDiff("hard")'> 
+                  Hard 
+                </button>
+              </div>
+            </div>
+            <div>
+              <button type='button' id='close-button' onClick='closeSettings()'> 
+                Close 
+              </button>
+            </div>
+          </div> <!-- end settings-info -->
+        </div> <!-- end settings-popup -->
+          
+        <!-- Game Over page 
+        <div class='game-over-page'>
+          <div>
+            <div> GAME OVER! </div>
+            <div> YOU HAVE TO QUARANTINE!</div>
+            <div id='display-score'></div>
+            <div> 
+              <button type='button' id='start-over' onClick='startOver()'> 
+                Start Over
+              </button>
+            </div>
+          </div>
+        </div> -->
+
+        <!-- Tutorial -->
+        <div class='tutorial'>
+          <h1> How to play </h1>
+          <div>Avoid Covid Particles!</div>
+          <div><img id='asteroid-tut' src='./src/covidstriod.png'></div>
+          <div> Collect masks and vaccines! </div>
+          <div> Gain as many points as possible! </div>
+          <div>
+            <img id='mask-tut' src='./src/mask.gif'>
+            <img id='vacc-tut' src='./src/vacc.gif'>
+          </div>
+          </br>
+          <button type='button' id='start-tut' onClick='showSplash()'> 
+            Start 
+          </button>
+        </div> <!-- end tutorial -->
+
+        <!-- Actual Game -->
+        <div id="actual_game">
+          <div class='splashScreen'>
+            <div id='get-ready'> Get Ready! </div>
+            <div><img src='./src/arrowkeys.png'></div>
+            <div> Use arrow keys to move. </div>
+          </div> <!-- end splashScreen-->
+          <div id="game_right_section">
+              <div id="scoreword">
+                  SCORE
+                  <div id="score_num">0</div>
+              </div>
+              <div id="covid_danger">COVID DANGER
+              <div id="covid_danger_num"></div></div>
+              <div id="level">LEVEL
+              <div id="covid_level"></div></div>
+          </div> <!--end game right section-->
+          <div class="asteroidSection">
+              <div class="curAstroid"> </div>
+          </div>
+          <div class="person"> </div>
+        </div> <!-- end actual game-->
+      </div> <!-- end game-window -->
+  </div> <!-- end outer-container -->
+</body>
+
+</html>
