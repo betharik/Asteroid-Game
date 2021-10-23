@@ -20,6 +20,7 @@ let vaccineOccurrence = 20000;       // Vaccine spawns every 20 seconds
 let vaccineGone = 5000;              // Vaccine disappears in 5 seconds
 let maskOccurrence = 15000;          // Masks spawn every 15 seconds
 let maskGone = 5000;                 // Mask disappears in 5 seconds
+let COVID_SPEED = 1;
 
 // Movement Helpers
 var LEFT = false;
@@ -83,6 +84,13 @@ document.onkeyup = function (e) {
 // ==============================================
 // =========== Utility Functions Here ===========
 // ==============================================
+
+function startGame() {
+  $('.person').append("<img id='player' src='./src/player/player.gif'>").hide();
+  $('.person').delay(3000).fadeIn();
+  
+  setTimeout(spawnCovid, 3000);
+}
 
 // Person
 function movePerson() {
@@ -179,15 +187,22 @@ function movePerson() {
 // Covid
 function spawnCovid() {
   console.log('Spawning Covid...');
-  
+
+  setInterval( function () {
+    fireOne();
+  }, 5000); // 500
+}
+
+function fireOne() {
+  // one covid, determine starting point
+  console.log("fire one comet");
   var covidDiv = "<img src='./src/covidstriod.png' style='position: absolute;' id='c-" + covidIdx + "'/>";
-  $('.curAstroid').delay(3400).append(covidDiv).hide();
+  $('.curAstroid').append(covidDiv);
   $(".curAstroid").fadeIn();
 
   var curCovid = $('#c-' + covidIdx);
-  covidIdx++;
 
-  var corner = parseInt(getRandomNumber(1,8));
+  var corner = parseInt(getRandomNumber(1,5));
   var startX; 
   var startY;
 
@@ -199,75 +214,81 @@ function spawnCovid() {
   //   startY = getRandomNumber(-40, maxPersonPosY + 40);
   // }
   // else if (corner == 2) {
-  //   // right
-  //   startX = maxPersonPosX + 40;
-  //   startY = getRandomNumber(-40, maxPersonPosY + 40);
-  // }
-  // else if (corner == 3) {
-  //   // down
-  //   startY = maxPersonPosY + 40;
-  //   startX = getRandomNumber(-40, maxPersonPosX + 40);
-  // }
+  if (corner == 2) {
+    // right
+    startX = maxPersonPosX + 40;
+    startY = getRandomNumber(-40, maxPersonPosY + 40);
+  }
+  else if (corner == 3) {
+    // down
+    startY = maxPersonPosY + 40;
+    startX = getRandomNumber(-40, maxPersonPosX + 40);
+  }
   // else if (corner == 4) {
   //   // up
   //   startY = -40;
   //   startX = getRandomNumber(-40, maxPersonPosX + 40);
   // }
-  // else if (corner == 5) {
-  //   // upper corner left
-  //   startY = -40;
-  //   startX = -40;
-  // }
-  // else if (corner == 6) {
-  //   // upper corner right
-  //   startY = maxPersonPosY + 40;
-  //   startX = -40;
-  // }
-  // else if (corner == 7) {
-  //   // lower corner left
-  //   startY = maxPersonPosY + 40;
-  //   startX = -40;
-  // }
-  // else if (corner == 8) {
-  //   // lower corner right
-  //   startY = maxPersonPosY + 40;
-  //   startX = maxPersonPosX + 40;
-  // }
 
-  startX = maxPersonPosX + 40;
-  startY = 600;
-  
-  // Set Starting Point, pos of asteroid is set to center
-  console.log("startY, startX " + startY + ", " + startX);
   curCovid.css({"top": startY, 'left': startX});
+  moveCovid("#c-" + covidIdx);
 
-  var COVID_SPEED_X = -1;
-  var COVID_SPEED_Y = -1;
-  // if (startX === -40) {
-  //   COVID_SPEED_X = getRandomNumber(0, 7);
+  covidIdx++;
+}
+
+function moveCovid(comet) {
+  var curCovid = $(comet);
+  console.log("comet " + comet);
+
+  // if (diffLevel == 'easy') {
+  //   COVID_SPEED= COVID_SPEED*1;
   // }
-  // if (startX !== -40) {
-  //   COVID_SPEED_X = getRandomNumber(-7, 0);
+  // else if (diffLevel == 'normal') {
+  //   COVID_SPEED = COVID_SPEED*3;
   // }
-  // if (startY === -40) {
-  //   COVID_SPEED_Y = getRandomNumber(0, 7);
+  // else if (diffLevel == 'hard') {
+  //   COVID_SPEED = COVID_SPEED*5;
   // }
-  // if (startY !== -40) {
-  //   COVID_SPEED_Y = getRandomNumber(-7, 0);
-  // }
-  // console.log("speedY, speedX ", + COVID_SPEED_Y + " " + COVID_SPEED_X);
-  // spawn
+
+  var x = parseInt(curCovid.css("left"))
+  var y = parseInt(curCovid.css("top"));
+
+  var COVID_SPEED_X;
+  var COVID_SPEED_Y;  
+
+  if (x < 0) {
+    console.log("top pos");
+    COVID_SPEED_X = COVID_SPEED;
+  }
+  else if (x > maxPersonPosX) {
+    console.log("right negative speed'");
+    COVID_SPEED_X = -(COVID_SPEED);
+  }
+  if (y < 0) {
+    console.log("left pos");
+    COVID_SPEED_Y = COVID_SPEED;
+  }
+  else if (y > maxPersonPosY) {
+    console.log("down negative speed");
+    COVID_SPEED_Y = -(COVID_SPEED);
+  }
+
   setInterval( function() {
-    console.log("moving");
-    curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
-    curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
-    if (parseInt(curCovid.css("top")) < -40 || 
-        parseInt(curCovid.css("left")) < -40 ||
-        parseInt(curCovid.css("top")) > maxPersonPosY + 40 || 
-        parseInt(curCovid.css("left")) > maxPersonPosX + 40) {
-      curCovid.remove();
-    } 
-  }, AST_OBJECT_REFRESH_RATE);
+    shootCovid(comet, COVID_SPEED_X, COVID_SPEED_Y)}, 5000); //AST_OBJECT_REFRESH_RATE
+}
+
+function shootCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
+  var curCovid = $(comet);
+  console.log("moving");
+  console.log("speedX, speedY " + COVID_SPEED_X + "  " + COVID_SPEED_Y);
+  curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
+  curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
+  if (parseInt(curCovid.css("top")) < -40 || 
+      parseInt(curCovid.css("left")) < -40 ||
+      parseInt(curCovid.css("top")) > maxPersonPosY + 30 || 
+      parseInt(curCovid.css("left")) > maxPersonPosX + 30) {
+    curCovid.remove();
+  } 
 }
 
 // Are two elements currently colliding?
@@ -360,7 +381,8 @@ function showSplash() {
   $('.tutorial').hide();
   $('#actual_game').show().css('display', 'flex');
   $('.splashScreen').delay(3000).fadeOut('slow');
-  $('.person').append("<img id='player' src='./src/player/player.gif'>").hide();
-  $('.person').delay(3500).fadeIn();
-  spawnCovid(fireOne);
+  // startGame(spawnCovid);
+  startGame();
 }
+
+// showCovid(fireOne);
