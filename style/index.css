@@ -19,8 +19,6 @@ button {
   float: left;
   position: relative;
   z-index: 0;
-  align-items: center;
-  text-align: center;
 }
 
 /* Main Menu */
@@ -244,25 +242,18 @@ button {
 .person {
   display: inline-block;
   position: absolute; 
-  width: 62px;
-  /* left: 600px;
-  top: 300px; */
   z-index: 5;
-  /* height: 100px; */
 }
 
-/* #person > img {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-} */
-
-/* #player {
-  position: relative; 
-  z-index: 40;
-  text-align: center;
-  display: block;
-} */
+.asteroidSection {
+  display: inline-block !important;
+  height: 600px;
+  width: 320px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
 
 /* game over page */
 .game-over-page {

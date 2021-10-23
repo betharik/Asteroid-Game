@@ -41,15 +41,8 @@ var OBJECT_REFRESH_TIME = 70; // ms
 // Global Object Handles
 var person;
 
-// Position variables
-var KEYS = {
-  left: 37, 
-  right: 39, 
-  up: 38,
-  down: 40,
-  spacebar: 32,
-  shift: 16
-}
+// Counters
+var covidIdx = 1;
 
 // ==============================================
 // ============ Functional Code Here ============
@@ -62,48 +55,28 @@ $(document).ready(function () {
     
     person = $('.person');
 
-    $(window).keydown(keyPressRouter); 
-
-    maxPersonPosX = game_window.width() - 62; 
-    maxPersonPosY = game_window.height() - 62; 
     console.log("Max X is: " + maxPersonPosX); 
     console.log("Max Y is: " + maxPersonPosY);
 });
 
 // TODO: ADD YOUR FUNCTIONS HERE
 
-// which key was pressed?
-function keyPressRouter(event) {
-  switch(event.which) {
-    case KEYS.up:
-    case KEYS.down: 
-    case KEYS.left: 
-    case KEYS.right:
-      console.log("Arrow key pressed!");  
-      movePerson(event.which); 
-      break;
-    default: 
-      console.log("INVALID INPUT!!!!");       
-      break;
-  }
+// Keydown event handler
+document.onkeydown = function(e) {
+    if (e.key == 'ArrowLeft') LEFT = true;
+    if (e.key == 'ArrowRight') RIGHT = true;
+    if (e.key == 'ArrowUp') UP = true;
+    if (e.key == 'ArrowDown') DOWN = true;
+    movePerson();
 }
 
-// // Keydown event handler
-// document.onkeydown = function(e) {
-//     if (e.key == 'ArrowLeft') LEFT = true;
-//     if (e.key == 'ArrowRight') RIGHT = true;
-//     if (e.key == 'ArrowUp') UP = true;
-//     if (e.key == 'ArrowDown') DOWN = true;
-// }
-
-// // Keyup event handler
-// document.onkeyup = function (e) {
-//     if (e.key == 'ArrowLeft') LEFT = false;
-//     if (e.key == 'ArrowRight') RIGHT = false;
-//     if (e.key == 'ArrowUp') UP = false;
-//     if (e.key == 'ArrowDown') DOWN = false;
-// }
-
+// Keyup event handler
+document.onkeyup = function (e) {
+    if (e.key == 'ArrowLeft') LEFT = false;
+    if (e.key == 'ArrowRight') RIGHT = false;
+    if (e.key == 'ArrowUp') UP = false;
+    if (e.key == 'ArrowDown') DOWN = false;
+}
 
 //===================================================
 
@@ -112,63 +85,189 @@ function keyPressRouter(event) {
 // ==============================================
 
 // Person
-function movePerson(direction) {
-  switch(direction) {
-    case (KEYS.left && KEYS.up):
-      console.log("moving up left"); 
-      var newPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
-      if (newPos < 0) {
-        newPos = 0; 
-      }
-      person.css("top", newPos)
-      newPos = parseInt(person.css("left")) - PERSON_MOVEMENT; 
-      if (newPos < 0) {
-        newPos = 0; 
-      }
-      person.css("left", newPos); 
-      $('#player').attr('src', './src/player/player_up.gif');
-      break;
-    case KEYS.left: 
-      console.log("moving left"); 
-      var newPos = parseInt(person.css("left")) - PERSON_MOVEMENT; 
-      if (newPos < 0) {
-        newPos = 0; 
-      }
-      person.css("left", newPos); 
-      $('#player').attr('src', './src/player/player_left.gif');
-      break; 
-    case KEYS.up: 
-      console.log("moving up"); 
-      var newPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
-      if (newPos < 0) {
-        newPos = 0; 
-      }
-      person.css("top", newPos)
-      $('#player').attr('src', './src/player/player_up.gif');
-      break;
-    case KEYS.down: 
-      console.log("moving down"); 
-      var newPos = parseInt(person.css("top")) + PERSON_MOVEMENT;
-      if (newPos > maxPersonPosY) {
-        newPos = maxPersonPosY; 
-      }
-      person.css("top", newPos); 
-      $('#player').attr('src', './src/player/player_down.gif');
-      break;
-    case KEYS.right: 
-      console.log("moving right");
-      var newPos = parseInt(person.css("left")) + PERSON_MOVEMENT;
-      if (newPos > maxPersonPosX) {
-        newPos = maxPersonPosX; 
-      }
-      person.css("left", newPos);
-      $('#player').attr('src', './src/player/player_right.gif');
-      break;
+function movePerson() {
+  if (LEFT && UP) {
+    console.log("moving diag up left"); 
+    var upPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
+    if (upPos < 0) {
+      upPos = 0; 
+    }
+    var lPos = parseInt(person.css("left")) - PERSON_MOVEMENT; 
+    if (lPos < 0) {
+      lPos = 0; 
+    }
+    person.css({'left': lPos, 'top': upPos}); 
+    $('#player').attr('src', './src/player/player_up.gif');
+  }
+  else if (LEFT && DOWN) {
+    console.log("moving diag down left"); 
+    var upPos = parseInt(person.css("top")) + PERSON_MOVEMENT; 
+    if (upPos > maxPersonPosY) {
+      upPos = maxPersonPosY; 
+    }
+    var lPos = parseInt(person.css("left")) - PERSON_MOVEMENT; 
+    if (lPos < 0) {
+      lPos = 0; 
+    }
+    person.css({'left': lPos, 'top': upPos}); 
+    $('#player').attr('src', './src/player/player_down.gif');
+  }
+  else if (RIGHT && UP) {
+    console.log("moving diag up right"); 
+    var upPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
+    if (upPos < 0) {
+      upPos = 0; 
+    }
+    var lPos = parseInt(person.css("left")) + PERSON_MOVEMENT; 
+    if (lPos > maxPersonPosX) {
+      lPos = maxPersonPosX; 
+    }
+    person.css({'left': lPos, 'top': upPos}); 
+    $('#player').attr('src', './src/player/player_up.gif');
+  }
+  else if (RIGHT && DOWN) {
+    console.log("moving diag down right"); 
+    var upPos = parseInt(person.css("top")) + PERSON_MOVEMENT; 
+    if (upPos > maxPersonPosY) {
+      upPos = maxPersonPosY; 
+    }
+    var lPos = parseInt(person.css("left")) + PERSON_MOVEMENT; 
+    if (lPos > maxPersonPosX) {
+      lPos = maxPersonPosX; 
+    }
+    person.css({'left': lPos, 'top': upPos}); 
+    $('#player').attr('src', './src/player/player_down.gif');
+  }
+  else if (LEFT) {
+    console.log("moving left"); 
+    var newPos = parseInt(person.css("left")) - PERSON_MOVEMENT; 
+    if (newPos < 0) {
+      newPos = 0; 
+    }
+    person.css("left", newPos); 
+    $('#player').attr('src', './src/player/player_left.gif');
+  }
+  else if (UP) { 
+    console.log("moving up"); 
+    var newPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
+    if (newPos < 0) {
+      newPos = 0; 
+    }
+    person.css("top", newPos)
+    $('#player').attr('src', './src/player/player_up.gif');
+  }
+  else if (DOWN) {
+    console.log("moving down"); 
+    var newPos = parseInt(person.css("top")) + PERSON_MOVEMENT;
+    if (newPos > maxPersonPosY) {
+      newPos = maxPersonPosY; 
+    }
+    person.css("top", newPos); 
+    $('#player').attr('src', './src/player/player_down.gif');
+  }
+  else if (RIGHT) {
+    console.log("moving right");
+    var newPos = parseInt(person.css("left")) + PERSON_MOVEMENT;
+    if (newPos > maxPersonPosX) {
+      newPos = maxPersonPosX; 
+    }
+    person.css("left", newPos);
+    $('#player').attr('src', './src/player/player_right.gif');
   }
 }
 
-function playerToNormal() {
+// Covid
+function spawnCovid() {
+  console.log('Spawning Covid...');
+  
+  var covidDiv = "<img src='./src/covidstriod.png' style='position: absolute;' id='c-" + covidIdx + "'/>";
+  $('.curAstroid').delay(3400).append(covidDiv).hide();
+  $(".curAstroid").fadeIn();
 
+  var curCovid = $('#c-' + covidIdx);
+  covidIdx++;
+
+  var corner = parseInt(getRandomNumber(1,8));
+  var startX; 
+  var startY;
+
+  console.log("corner " + corner);
+
+  // if (corner == 1) {
+  //   // left
+  //   startX = -40;
+  //   startY = getRandomNumber(-40, maxPersonPosY + 40);
+  // }
+  // else if (corner == 2) {
+  //   // right
+  //   startX = maxPersonPosX + 40;
+  //   startY = getRandomNumber(-40, maxPersonPosY + 40);
+  // }
+  // else if (corner == 3) {
+  //   // down
+  //   startY = maxPersonPosY + 40;
+  //   startX = getRandomNumber(-40, maxPersonPosX + 40);
+  // }
+  // else if (corner == 4) {
+  //   // up
+  //   startY = -40;
+  //   startX = getRandomNumber(-40, maxPersonPosX + 40);
+  // }
+  // else if (corner == 5) {
+  //   // upper corner left
+  //   startY = -40;
+  //   startX = -40;
+  // }
+  // else if (corner == 6) {
+  //   // upper corner right
+  //   startY = maxPersonPosY + 40;
+  //   startX = -40;
+  // }
+  // else if (corner == 7) {
+  //   // lower corner left
+  //   startY = maxPersonPosY + 40;
+  //   startX = -40;
+  // }
+  // else if (corner == 8) {
+  //   // lower corner right
+  //   startY = maxPersonPosY + 40;
+  //   startX = maxPersonPosX + 40;
+  // }
+
+  startX = maxPersonPosX + 40;
+  startY = 600;
+  
+  // Set Starting Point, pos of asteroid is set to center
+  console.log("startY, startX " + startY + ", " + startX);
+  curCovid.css({"top": startY, 'left': startX});
+
+  var COVID_SPEED_X = -1;
+  var COVID_SPEED_Y = -1;
+  // if (startX === -40) {
+  //   COVID_SPEED_X = getRandomNumber(0, 7);
+  // }
+  // if (startX !== -40) {
+  //   COVID_SPEED_X = getRandomNumber(-7, 0);
+  // }
+  // if (startY === -40) {
+  //   COVID_SPEED_Y = getRandomNumber(0, 7);
+  // }
+  // if (startY !== -40) {
+  //   COVID_SPEED_Y = getRandomNumber(-7, 0);
+  // }
+  // console.log("speedY, speedX ", + COVID_SPEED_Y + " " + COVID_SPEED_X);
+  // spawn
+  setInterval( function() {
+    console.log("moving");
+    curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
+    curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
+    if (parseInt(curCovid.css("top")) < -40 || 
+        parseInt(curCovid.css("left")) < -40 ||
+        parseInt(curCovid.css("top")) > maxPersonPosY + 40 || 
+        parseInt(curCovid.css("left")) > maxPersonPosX + 40) {
+      curCovid.remove();
+    } 
+  }, AST_OBJECT_REFRESH_RATE);
 }
 
 // Are two elements currently colliding?
@@ -263,4 +362,5 @@ function showSplash() {
   $('.splashScreen').delay(3000).fadeOut('slow');
   $('.person').append("<img id='player' src='./src/player/player.gif'>").hide();
   $('.person').delay(3500).fadeIn();
+  spawnCovid(fireOne);
 }
