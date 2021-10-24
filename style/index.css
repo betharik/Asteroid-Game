@@ -54,7 +54,7 @@ button {
   z-index: -1;
 } 
 
-#landing-button {
+.landing-button {
   position: relative;
   width: 200px;
   height: 100px;
@@ -255,11 +255,43 @@ button {
   z-index: 1;
 }
 
+.mask-vacc {
+  display: inline-block !important;
+  height: 600px;
+  width: 320px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
+
+#mask {
+  width: 70px;
+  height: 33px;
+}
+
+#vacc {
+  width: 57px;
+  height: 57px;
+}
+
 /* game over page */
 .game-over-page {
-  /* visibility: hide; */
-  position: relative;
-  background-image: url(../src/frontpage_background.jpg);
-  background-size: contain;
-  z-index: -1;
+  flex-direction: column;
+  position: absolute;
+  display: none;
+  background-color: #A00;
+  z-index: 30;
+  width: 50%;
+  height: 40%;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
+
+.game-over-page > div {
+  font-size: 30px;
+  color: blue;
+  margin: 40px;
+}
+

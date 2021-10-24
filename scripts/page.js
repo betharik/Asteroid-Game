@@ -45,6 +45,18 @@ var person;
 // Counters
 var covidIdx = 1;
 
+// SCOREBOARD
+let SCORE = 0;
+let COVID_DANGER = 20;
+let LEVEL = 1;
+let diffIdx = 1;
+let maskOn = false;
+let GAME_OVER = false;
+
+// Sounds
+var collectau = new Audio('./src/audio/collect.mp3');
+var dieau = new Audio('./src/audio/die.mp3');
+
 // ==============================================
 // ============ Functional Code Here ============
 // ==============================================
@@ -54,8 +66,6 @@ $(document).ready(function () {
     // ====== Startup ====== 
     game_window = $('.game-window');
     
-    person = $('.person');
-
     console.log("Max X is: " + maxPersonPosX); 
     console.log("Max Y is: " + maxPersonPosY);
 });
@@ -86,10 +96,207 @@ document.onkeyup = function (e) {
 // ==============================================
 
 function startGame() {
-  $('.person').append("<img id='player' src='./src/player/player.gif'>").hide();
-  $('.person').delay(3000).fadeIn();
+  GAME_OVER = false;
+  person = $('.person');
+
+  person.append("<img id='player' style='top: 329px; left: 638px;' src='./src/player/player.gif'>").hide();
+  person.delay(500).fadeIn();
   
-  setTimeout(spawnCovid, 3000);
+  setTimeout(spawnCovid, 3500);
+}
+
+function spawnCovid() {
+  console.log('Spawning Covid...');
+  console.log('Difficulty ' + diffLevel);
+
+  if (diffLevel == 'easy') {
+    spawnRate= 1000;
+    diffIdx = 1;
+    COVID_DANGER = 10;
+  }
+  else if (diffLevel == 'normal') {
+    spawnRate = 800;
+    diffIdx = 3;
+    COVID_DANGER = 20;
+  }
+  else {
+    spawnRate = 600;
+    diffIdx = 5;
+    COVID_DANGER = 30;
+  }
+
+  setInterval(shootCovid, spawnRate);
+  // shootMask every 15s, disappears every 5s
+  setInterval(shootMask, maskOccurrence); //maskOccurrence
+  // shootVacc every 20s, disappears every 5s
+  setInterval(shootVacc, vaccineOccurrence); // vaccineOccurrence
+}
+
+function shootCovid() {
+  // determine starting point of new comet
+  // move the comet every interval
+  if (GAME_OVER === false) {
+    console.log("shoot one comet");
+
+    var corner = parseInt(getRandomNumber(1,5));
+    var startX; 
+    var startY;
+
+    if (corner == 1) {
+      // left
+      startX = -40;
+      startY = getRandomNumber(-40, maxPersonPosY + 40);
+    }
+    else if (corner == 2) {
+      startX = maxPersonPosX + 40;
+      startY = getRandomNumber(-40, maxPersonPosY + 40);
+    }
+    else if (corner == 3) {
+      // down
+      startY = maxPersonPosY + 40;
+      startX = getRandomNumber(-40, maxPersonPosX + 40);
+    }
+    else {
+      // up
+      startY = -40;
+      startX = getRandomNumber(-40, maxPersonPosX + 40);
+    }
+
+    console.log("corner " + corner);
+
+    var covidDiv = "<img src='./src/covidstriod.png' style='position: absolute; top:" + startY + "; left:" + startX + "; ' id='c-" + covidIdx + "'/>";
+
+    $('.curAstroid').append(covidDiv);
+    $(".curAstroid").fadeIn();
+
+    var comet = "#c-" + covidIdx;
+
+    var speedX = getSpeedX(comet);
+    var speedY = getSpeedY(comet);
+    
+    setInterval(function() {
+      console.log("diffIDX " + diffIdx);
+      moveCovid(comet, speedX*diffIdx, speedY*diffIdx);
+    }, AST_OBJECT_REFRESH_RATE); // AST_OBJECT_REFRESH_RATE move with the const val above
+
+    covidIdx++;
+  }
+  return;
+}
+
+function getSpeedX(comet) {
+  var curCovid = $(comet);
+  x = parseInt(curCovid.css("left"));
+  console.log("startPosx ", x);
+
+  if (x == -40) {
+    // move down
+    return COVID_SPEED;
+  }
+  else if (x > maxPersonPosX) {
+    console.log("iuhfeivhiwu");
+    return -(COVID_SPEED);
+  }
+  // x is in between
+  else if (x > maxPersonPosX/2) {
+    return -(COVID_SPEED);
+  }
+  else {
+    return COVID_SPEED;
+  }
+}
+
+function getSpeedY(comet) {
+  var curCovid = $(comet);
+  y = parseInt(curCovid.css("top"));
+  console.log("startPosY ", y);
+
+  if (y == -40) {
+    // move down
+    return COVID_SPEED;
+  }
+  else if (y > maxPersonPosY) {
+    console.log("iuhfeivhiwu");
+    return -(COVID_SPEED);
+  }
+  // y is in between
+  else if (y > maxPersonPosY/2) {
+    return -(COVID_SPEED);
+  }
+  else {
+    return COVID_SPEED;
+  }
+}
+
+function moveCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
+  if (GAME_OVER === false) {
+    var curCovid = $(comet);
+    console.log("moving");
+    console.log("speedX, speedY " + COVID_SPEED_X + "  " + COVID_SPEED_Y);
+    curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
+    curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
+    if (isColliding(person, curCovid)) {
+      console.log("hit");
+      if (!maskOn) {
+        // die
+        dieau.play();
+        player.attr('src', './src/player/player_touched.gif');
+        setTimeout(function () {
+          person.empty();
+          $('.curAstroid').empty();
+          $('.mask-vacc').empty();
+          $('#actual_game').hide();
+          $('.landing-page').show();
+          $('.landing-button').hide();
+          $('.game-over-page').css('display', 'flex');
+        }, 2000);
+        GAME_OVER = true;
+        return;
+      }
+      else {
+        maskOn = false;
+      }
+    }
+    if (parseInt(curCovid.css("top")) <= -40|| 
+        parseInt(curCovid.css("left")) <= -40 ||
+        parseInt(curCovid.css("top")) >= maxPersonPosY + 40|| 
+        parseInt(curCovid.css("left")) >= maxPersonPosX + 40) {
+      curCovid.remove();
+    } 
+  }
+  return;
+}
+
+function shootMask() {
+  if (GAME_OVER === false) {
+    console.log("Mask ...");
+
+    var startmY = getRandomNumber(60, maxPersonPosY - 60);
+    var startmX = getRandomNumber(60, maxPersonPosX - 60);
+    var maskDiv = "<img src='./src/mask.gif' style='position: absolute; top:" + startmY + "; left:" + startmX + "; ' id='mask" + "'/>";
+    $(".curMask").append(maskDiv).fadeIn();
+    mask = $('#mask');
+    setTimeout(function () {
+      $("#mask").remove();
+    }, maskGone);
+  }
+  return;
+}
+
+function shootVacc() {
+  if (GAME_OVER === false) {
+    console.log("Vaccine ...");
+
+    var startvY = getRandomNumber(60, maxPersonPosY - 60);
+    var startvX = getRandomNumber(60, maxPersonPosX - 60);
+    var vaccDiv = "<img src='./src/vacc.gif' style='position: absolute; top:" + startvY + "; left:" + startvX + "; ' id='vacc" + "'/>";
+    $(".curVacc").append(vaccDiv).fadeIn();
+    vaccine = $('#vacc');
+    setTimeout(function () {
+      $("#vacc").remove();
+    }, vaccineGone);
+  }
+  return;
 }
 
 // Person
@@ -182,114 +389,16 @@ function movePerson() {
     person.css("left", newPos);
     $('#player').attr('src', './src/player/player_right.gif');
   }
+  if (isColliding(mask, person)) {
+    console.log("mask hit!!!!!");
+    collectau.play();
+  }
+  if (isColliding(vaccine, person)) {
+    console.log("Vacc hit!!!");
+    collectau.play();
+  }
 }
 
-// Covid
-function spawnCovid() {
-  console.log('Spawning Covid...');
-
-  setInterval( function () {
-    fireOne();
-  }, 5000); // 500
-}
-
-function fireOne() {
-  // one covid, determine starting point
-  console.log("fire one comet");
-  var covidDiv = "<img src='./src/covidstriod.png' style='position: absolute;' id='c-" + covidIdx + "'/>";
-  $('.curAstroid').append(covidDiv);
-  $(".curAstroid").fadeIn();
-
-  var curCovid = $('#c-' + covidIdx);
-
-  var corner = parseInt(getRandomNumber(1,5));
-  var startX; 
-  var startY;
-
-  console.log("corner " + corner);
-
-  // if (corner == 1) {
-  //   // left
-  //   startX = -40;
-  //   startY = getRandomNumber(-40, maxPersonPosY + 40);
-  // }
-  // else if (corner == 2) {
-  if (corner == 2) {
-    // right
-    startX = maxPersonPosX + 40;
-    startY = getRandomNumber(-40, maxPersonPosY + 40);
-  }
-  else if (corner == 3) {
-    // down
-    startY = maxPersonPosY + 40;
-    startX = getRandomNumber(-40, maxPersonPosX + 40);
-  }
-  // else if (corner == 4) {
-  //   // up
-  //   startY = -40;
-  //   startX = getRandomNumber(-40, maxPersonPosX + 40);
-  // }
-
-  curCovid.css({"top": startY, 'left': startX});
-  moveCovid("#c-" + covidIdx);
-
-  covidIdx++;
-}
-
-function moveCovid(comet) {
-  var curCovid = $(comet);
-  console.log("comet " + comet);
-
-  // if (diffLevel == 'easy') {
-  //   COVID_SPEED= COVID_SPEED*1;
-  // }
-  // else if (diffLevel == 'normal') {
-  //   COVID_SPEED = COVID_SPEED*3;
-  // }
-  // else if (diffLevel == 'hard') {
-  //   COVID_SPEED = COVID_SPEED*5;
-  // }
-
-  var x = parseInt(curCovid.css("left"))
-  var y = parseInt(curCovid.css("top"));
-
-  var COVID_SPEED_X;
-  var COVID_SPEED_Y;  
-
-  if (x < 0) {
-    console.log("top pos");
-    COVID_SPEED_X = COVID_SPEED;
-  }
-  else if (x > maxPersonPosX) {
-    console.log("right negative speed'");
-    COVID_SPEED_X = -(COVID_SPEED);
-  }
-  if (y < 0) {
-    console.log("left pos");
-    COVID_SPEED_Y = COVID_SPEED;
-  }
-  else if (y > maxPersonPosY) {
-    console.log("down negative speed");
-    COVID_SPEED_Y = -(COVID_SPEED);
-  }
-
-  setInterval( function() {
-    shootCovid(comet, COVID_SPEED_X, COVID_SPEED_Y)}, 5000); //AST_OBJECT_REFRESH_RATE
-}
-
-function shootCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
-  var curCovid = $(comet);
-  console.log("moving");
-  console.log("speedX, speedY " + COVID_SPEED_X + "  " + COVID_SPEED_Y);
-  curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
-  curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
-  if (parseInt(curCovid.css("top")) < -40 || 
-      parseInt(curCovid.css("left")) < -40 ||
-      parseInt(curCovid.css("top")) > maxPersonPosY + 30 || 
-      parseInt(curCovid.css("left")) > maxPersonPosX + 30) {
-    curCovid.remove();
-  } 
-}
 
 // Are two elements currently colliding?
 function isColliding(o1, o2) {
@@ -334,7 +443,7 @@ function getRandomNumber(min, max){
 
 // Main Menu
 function showPlayGame() {
-  if (firstLoad == true) {
+  if (firstLoad === true) {
     showTutorial();
     firstLoad = false;
   }
@@ -379,10 +488,16 @@ function showTutorial() {
 
 function showSplash() {
   $('.tutorial').hide();
+  $('.landing-page').hide();
   $('#actual_game').show().css('display', 'flex');
+  $('.splashScreen').show();
   $('.splashScreen').delay(3000).fadeOut('slow');
-  // startGame(spawnCovid);
-  startGame();
+  setTimeout(startGame, 3000);
 }
 
-// showCovid(fireOne);
+function startOver() {
+  // go back to landing page
+  $('.landing-page').show();
+  $('.landing-button').show();
+  $('.game-over-page').css('display', 'none');
+}

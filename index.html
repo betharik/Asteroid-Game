@@ -19,12 +19,26 @@
           <!-- Main Menu -->
           <div class='landing-header'> Covid Comets </div>
           <div class='landing-buttons'>
-            <button type="button" id='landing-button' onClick='showPlayGame()'> 
+            <button type="button" class='landing-button' onClick='showPlayGame()'> 
               Play Game! 
             </button>
-            <button type='button' id='landing-button' onClick='showSettings()'> 
+            <button type='button' class='landing-button' onClick='showSettings()'> 
               Settings 
             </button>
+            <!-- Game Over page -->
+            <div class='game-over-page'>
+              <div>
+                <div> GAME OVER! </div> </br>
+                <div> YOU HAVE TO QUARANTINE!</div>
+                <div id='display-score'></div>  
+                </br>
+                <div> 
+                  <button type='button' id='start-over' onClick='startOver()'> 
+                    Start Over
+                  </button>
+                </div>
+              </div>
+            </div>
           </div> <!-- end landing-buttons -->
         </div> <!-- end landing-page-->
 
@@ -66,20 +80,6 @@
             </div>
           </div> <!-- end settings-info -->
         </div> <!-- end settings-popup -->
-          
-        <!-- Game Over page 
-        <div class='game-over-page'>
-          <div>
-            <div> GAME OVER! </div>
-            <div> YOU HAVE TO QUARANTINE!</div>
-            <div id='display-score'></div>
-            <div> 
-              <button type='button' id='start-over' onClick='startOver()'> 
-                Start Over
-              </button>
-            </div>
-          </div>
-        </div> -->
 
         <!-- Tutorial -->
         <div class='tutorial'>
@@ -117,6 +117,10 @@
           </div> <!--end game right section-->
           <div class="asteroidSection">
               <div class="curAstroid"> </div>
+          </div>
+          <div class="mask-vacc">
+           <div class="curMask"> </div> 
+           <div class="curVacc"> </div> 
           </div>
           <div class="person"> </div>
         </div> <!-- end actual game-->
