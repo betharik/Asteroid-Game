@@ -240,7 +240,7 @@ function moveCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
       if (!maskOn) {
         // die
         dieau.play();
-        player.attr('src', './src/player/player_touched.gif');
+        $('#player').attr('src', './src/player/player_touched.gif');
         setTimeout(function () {
           person.empty();
           $('.curAstroid').empty();
