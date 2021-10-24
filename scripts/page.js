@@ -235,14 +235,25 @@ function moveCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
     console.log("speedX, speedY " + COVID_SPEED_X + "  " + COVID_SPEED_Y);
     curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
     curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
+
+    if (parseInt(curCovid.css("top")) <= -40|| 
+        parseInt(curCovid.css("left")) <= -40 ||
+        parseInt(curCovid.css("top")) >= maxPersonPosY + 40|| 
+        parseInt(curCovid.css("left")) >= maxPersonPosX + 40) {
+      curCovid.remove();
+    } 
+
     if (isColliding(person, curCovid)) {
       console.log("hit");
-      if (!maskOn) {
-        // die
-        dieau.play();
-        $('#player').attr('src', './src/player/player_touched.gif');
+      console.log("maskON ", + maskOn);
+      if (maskOn === false) {
+        // die!
+        GAME_OVER = true;
+        dieau.play(); 
+        $('#player').attr({'src': './src/player/player_touched.gif'});
+        person = null;
         setTimeout(function () {
-          person.empty();
+          $('.person').empty();
           $('.curAstroid').empty();
           $('.mask-vacc').empty();
           $('#actual_game').hide();
@@ -250,19 +261,12 @@ function moveCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
           $('.landing-button').hide();
           $('.game-over-page').css('display', 'flex');
         }, 2000);
-        GAME_OVER = true;
         return;
       }
       else {
         maskOn = false;
       }
     }
-    if (parseInt(curCovid.css("top")) <= -40|| 
-        parseInt(curCovid.css("left")) <= -40 ||
-        parseInt(curCovid.css("top")) >= maxPersonPosY + 40|| 
-        parseInt(curCovid.css("left")) >= maxPersonPosX + 40) {
-      curCovid.remove();
-    } 
   }
   return;
 }
@@ -299,6 +303,13 @@ function shootVacc() {
   return;
 }
 
+function valMove(p) {
+  if (p === '#player') {
+    movePerson();
+  }
+  return;
+}
+
 // Person
 function movePerson() {
   if (LEFT && UP) {
@@ -312,7 +323,12 @@ function movePerson() {
       lPos = 0; 
     }
     person.css({'left': lPos, 'top': upPos}); 
-    $('#player').attr('src', './src/player/player_up.gif');
+    if (!maskOn) {
+      $('#player').attr('src', './src/player/player_up.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_up.gif');
+    }
   }
   else if (LEFT && DOWN) {
     console.log("moving diag down left"); 
@@ -325,7 +341,12 @@ function movePerson() {
       lPos = 0; 
     }
     person.css({'left': lPos, 'top': upPos}); 
-    $('#player').attr('src', './src/player/player_down.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_down.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_down.gif');
+    }
   }
   else if (RIGHT && UP) {
     console.log("moving diag up right"); 
@@ -338,7 +359,12 @@ function movePerson() {
       lPos = maxPersonPosX; 
     }
     person.css({'left': lPos, 'top': upPos}); 
-    $('#player').attr('src', './src/player/player_up.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_up.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_up.gif');
+    }
   }
   else if (RIGHT && DOWN) {
     console.log("moving diag down right"); 
@@ -351,7 +377,12 @@ function movePerson() {
       lPos = maxPersonPosX; 
     }
     person.css({'left': lPos, 'top': upPos}); 
-    $('#player').attr('src', './src/player/player_down.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_down.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_down.gif');
+    }
   }
   else if (LEFT) {
     console.log("moving left"); 
@@ -360,7 +391,12 @@ function movePerson() {
       newPos = 0; 
     }
     person.css("left", newPos); 
-    $('#player').attr('src', './src/player/player_left.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_left.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_left.gif');
+    }
   }
   else if (UP) { 
     console.log("moving up"); 
@@ -369,7 +405,12 @@ function movePerson() {
       newPos = 0; 
     }
     person.css("top", newPos)
-    $('#player').attr('src', './src/player/player_up.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_up.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_up.gif');
+    }
   }
   else if (DOWN) {
     console.log("moving down"); 
@@ -378,7 +419,12 @@ function movePerson() {
       newPos = maxPersonPosY; 
     }
     person.css("top", newPos); 
-    $('#player').attr('src', './src/player/player_down.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_down.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_down.gif');
+    }
   }
   else if (RIGHT) {
     console.log("moving right");
@@ -387,11 +433,20 @@ function movePerson() {
       newPos = maxPersonPosX; 
     }
     person.css("left", newPos);
-    $('#player').attr('src', './src/player/player_right.gif');
+    if (maskOn === false) {
+      $('#player').attr('src', './src/player/player_right.gif');
+    }
+    else {
+      $('#player').attr('src', './src/player/player_masked_right.gif');
+    }
   }
   if (isColliding(mask, person)) {
+    // wear mask
     console.log("mask hit!!!!!");
     collectau.play();
+    maskOn = true;
+    $(".curMask").empty();
+    $('#player').attr('src', './src/player/player_masked.gif');
   }
   if (isColliding(vaccine, person)) {
     console.log("Vacc hit!!!");
