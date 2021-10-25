@@ -38,6 +38,7 @@ let volLev = 50;
 var PERSON_MOVEMENT = 30;   // px
 var ROCKET_SPEED = 10;
 var OBJECT_REFRESH_TIME = 70; // ms
+var spawnRate;
 
 // Global Object Handles
 var person;
@@ -47,12 +48,17 @@ var covidIdx = 1;
 
 // SCOREBOARD
 let SCORE = 0;
-let COVID_DANGER = 20;
-let LEVEL = 1;
-let diffIdx = 1;
+var COVID_DANGER = 20;
+var LEVEL = 1;
+var diffIdx = 1;
 let maskOn;
 let GAME_OVER = false;
-let FINAL_SCORE;
+
+// functions
+
+var shootingCov;
+var shootingMask;
+var shootingVacc;
 
 // Sounds
 var collectau = new Audio('./src/audio/collect.mp3');
@@ -67,8 +73,6 @@ $(document).ready(function () {
     // ====== Startup ====== 
     game_window = $('.game-window');
     
-    console.log("Max X is: " + maxPersonPosX); 
-    console.log("Max Y is: " + maxPersonPosY);
 });
 
 // TODO: ADD YOUR FUNCTIONS HERE
@@ -104,41 +108,38 @@ function startGame() {
   person.append("<img id='player' style='top: 329px; left: 638px;' src='./src/player/player.gif'>").hide();
   person.delay(500).fadeIn();
 
-  // dieau.prop("volume", 0.1);
-  // collectau.prop("volume", )
-  
-  setTimeout(spawnCovid, 3500);
-}
+  COVID_SPEED = 1;
+  SCORE = 0;
+  LEVEL = 1;
 
-function setCovidDanger() {
-  if (diffLevel == 'easy') {
-    spawnRate= 1000;
-    diffIdx = 1;
-    COVID_DANGER = 10;
-  }
-  else if (diffLevel == 'normal') {
-    spawnRate = 800;
-    diffIdx = 3;
-    COVID_DANGER = 20;
-  }
-  else {
-    spawnRate = 600;
-    diffIdx = 5;
-    COVID_DANGER = 30;
-  }
+  $('#covid_danger_num').text(COVID_DANGER);
+  $('#covid_level').text(LEVEL);
+  $('#score_num').text('0');
+
+  console.log("COVID_SPEED " + COVID_SPEED);
+  console.log("SPAWN_RATE " + spawnRate);
+  console.log("Difficulty " + diffLevel);
+  
+  // setTimeout(spawnCovid, 3500);
+  spawnCovid();
+
+  setInterval(function() {
+    if (GAME_OVER === false) {
+      $('#score_num').text(SCORE);
+      SCORE = SCORE + 40;
+    }
+  }, 500);
 }
 
 function spawnCovid() {
   console.log('Spawning Covid...');
   console.log('Difficulty ' + diffLevel);
 
-  setCovidDanger();
-
-  setInterval(shootCovid, spawnRate);
+  shootingCov = setInterval(shootCovid, spawnRate);
   // shootMask every 15s, disappears every 5s
-  setInterval(shootMask, maskOccurrence); //maskOccurrence
+  shootingMask = setInterval(shootMask, maskOccurrence); //maskOccurrence
   // shootVacc every 20s, disappears every 5s
-  setInterval(shootVacc, vaccineOccurrence); // vaccineOccurrence
+  shootingVacc = setInterval(shootVacc, vaccineOccurrence); // vaccineOccurrence
 }
 
 function shootCovid() {
@@ -171,8 +172,6 @@ function shootCovid() {
       startX = getRandomNumber(-40, maxPersonPosX + 40);
     }
 
-    console.log("corner " + corner);
-
     var covidDiv = "<img src='./src/covidstriod.png' style='position: absolute; top:" + startY + "; left:" + startX + "; ' id='c-" + covidIdx + "'/>";
 
     $('.curAstroid').append(covidDiv);
@@ -183,18 +182,15 @@ function shootCovid() {
     var speedX = getSpeedX(comet);
     var speedY = getSpeedY(comet);
     
-    setInterval(function() {
-      console.log("diffIDX " + diffIdx);
+    const movingCovid = setInterval(function() {
       moveCovid(comet, speedX*diffIdx, speedY*diffIdx);
     }, AST_OBJECT_REFRESH_RATE); // AST_OBJECT_REFRESH_RATE move with the const val above
 
-    covidIdx++;
-    setInterval(function() {
-      if (GAME_OVER === false) {
-        $('#score_num').text(SCORE);
-        SCORE = SCORE + 40;
-      }
-    }, 500);
+    if (GAME_OVER === true) {
+      clearInterval(movingCovid);
+    }
+
+    covidIdx++; 
   }
   return;
 }
@@ -202,14 +198,12 @@ function shootCovid() {
 function getSpeedX(comet) {
   var curCovid = $(comet);
   x = parseInt(curCovid.css("left"));
-  console.log("startPosx ", x);
 
   if (x == -40) {
     // move down
     return COVID_SPEED;
   }
   else if (x > maxPersonPosX) {
-    console.log("iuhfeivhiwu");
     return -(COVID_SPEED);
   }
   // x is in between
@@ -224,14 +218,12 @@ function getSpeedX(comet) {
 function getSpeedY(comet) {
   var curCovid = $(comet);
   y = parseInt(curCovid.css("top"));
-  console.log("startPosY ", y);
 
   if (y == -40) {
     // move down
     return COVID_SPEED;
   }
   else if (y > maxPersonPosY) {
-    console.log("iuhfeivhiwu");
     return -(COVID_SPEED);
   }
   // y is in between
@@ -246,8 +238,7 @@ function getSpeedY(comet) {
 function moveCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
   if (GAME_OVER === false) {
     var curCovid = $(comet);
-    console.log("moving");
-    console.log("speedX, speedY " + COVID_SPEED_X + "  " + COVID_SPEED_Y);
+    
     curCovid.css("top", parseInt(curCovid.css("top")) + COVID_SPEED_Y);
     curCovid.css("left", parseInt(curCovid.css("left")) + COVID_SPEED_X);
 
@@ -271,20 +262,19 @@ function moveCovid(comet, COVID_SPEED_X, COVID_SPEED_Y) {
         setTimeout(function () {
           $('.person').empty();
           $('.curAstroid').empty();
-          $('.mask-vacc').empty();
+          $('.curMask').empty();
+          $('.curVacc').empty();
           $('#actual_game').hide();
           $('.landing-page').show();
           $('.landing-button').hide();
           $('.game-over-page').css('display', 'flex');
-          FINAL_SCORE = SCORE;
-          $('#display-score').text(FINAL_SCORE);
-          LEVEL = 1; setCovidDanger(); SCORE = 0;
-          $('#covid_level').text(LEVEL);
-          $('#covid_danger_num').text(COVID_DANGER);
+          $('#display-score').text(SCORE);
+          clearInterval(shootingCov);
+          clearInterval(shootingMask);
+          clearInterval(shootingVacc);
         }, 2000);
       }
       else {
-        console.log("heyp!!!!!!!");
         $('#player').attr({'src': './src/player/player.gif'});
         setTimeout(function() {maskOn = false}, 500);
         return;
@@ -303,7 +293,7 @@ function shootMask() {
     $(".curMask").append(maskDiv).fadeIn();
     mask = $('#mask');
     setTimeout(function () {
-      $("#mask").empty();
+      $("#mask").remove();
     }, maskGone);
   }
   return;
@@ -319,7 +309,7 @@ function shootVacc() {
     $(".curVacc").append(vaccDiv).fadeIn();
     vaccine = $('#vacc');
     setTimeout(function () {
-      $("#vacc").empty();
+      $("#vacc").remove();
     }, vaccineGone);
   }
   return;
@@ -328,7 +318,6 @@ function shootVacc() {
 // Person
 function movePerson() {
   if (LEFT && UP) {
-    console.log("moving diag up left"); 
     var upPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
     if (upPos < 0) {
       upPos = 0; 
@@ -346,7 +335,6 @@ function movePerson() {
     }
   }
   else if (LEFT && DOWN) {
-    console.log("moving diag down left"); 
     var upPos = parseInt(person.css("top")) + PERSON_MOVEMENT; 
     if (upPos > maxPersonPosY) {
       upPos = maxPersonPosY; 
@@ -364,7 +352,6 @@ function movePerson() {
     }
   }
   else if (RIGHT && UP) {
-    console.log("moving diag up right"); 
     var upPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
     if (upPos < 0) {
       upPos = 0; 
@@ -382,7 +369,6 @@ function movePerson() {
     }
   }
   else if (RIGHT && DOWN) {
-    console.log("moving diag down right"); 
     var upPos = parseInt(person.css("top")) + PERSON_MOVEMENT; 
     if (upPos > maxPersonPosY) {
       upPos = maxPersonPosY; 
@@ -400,7 +386,6 @@ function movePerson() {
     }
   }
   else if (LEFT) {
-    console.log("moving left"); 
     var newPos = parseInt(person.css("left")) - PERSON_MOVEMENT; 
     if (newPos < 0) {
       newPos = 0; 
@@ -413,8 +398,7 @@ function movePerson() {
       $('#player').attr('src', './src/player/player_masked_left.gif');
     }
   }
-  else if (UP) { 
-    console.log("moving up"); 
+  else if (UP) {
     var newPos = parseInt(person.css("top")) - PERSON_MOVEMENT; 
     if (newPos < 0) {
       newPos = 0; 
@@ -428,7 +412,6 @@ function movePerson() {
     }
   }
   else if (DOWN) {
-    console.log("moving down"); 
     var newPos = parseInt(person.css("top")) + PERSON_MOVEMENT;
     if (newPos > maxPersonPosY) {
       newPos = maxPersonPosY; 
@@ -442,7 +425,6 @@ function movePerson() {
     }
   }
   else if (RIGHT) {
-    console.log("moving right");
     var newPos = parseInt(person.css("left")) + PERSON_MOVEMENT;
     if (newPos > maxPersonPosX) {
       newPos = maxPersonPosX; 
@@ -455,23 +437,28 @@ function movePerson() {
       $('#player').attr('src', './src/player/player_masked_right.gif');
     }
   }
-  if (isColliding(mask, person)) {
-    // wear mask
-    console.log("mask hit!!!!!");
-    collectau.play();
-    maskOn = true;
-    $(".curMask").empty();
-    $('#player').attr('src', './src/player/player_masked.gif');
+  if (typeof mask !== 'undefined') {
+    if (isColliding(mask, person)) {
+      // wear mask
+      console.log("mask hit!!!!!");
+      collectau.play();
+      maskOn = true;
+      // $(".curMask").empty();
+      mask.remove();
+      $('#player').attr('src', './src/player/player_masked.gif');
+    }
   }
-  if (isColliding(vaccine, person)) {
-    console.log("Vacc hit!!!");
-    collectau.play();
-    $(".curVacc").empty();
-    ++LEVEL;
-    COVID_SPEED = COVID_SPEED + (0.2 * diffIdx);
-    COVID_DANGER = COVID_DANGER + 2;
-    $('#covid_level').text(LEVEL);
-    $('#covid_danger_num').text(COVID_DANGER);
+  if (typeof vaccine !== 'undefined') {
+    if (isColliding(vaccine, person)) {
+      console.log("Vacc hit!!!");
+      collectau.play();
+      $(".curVacc").empty();
+      ++LEVEL;
+      COVID_SPEED = COVID_SPEED + (0.2 * diffIdx);
+      COVID_DANGER = COVID_DANGER + 2;
+      $('#covid_level').text(LEVEL);
+      $('#covid_danger_num').text(COVID_DANGER);
+    }
   }
 }
 
@@ -544,15 +531,15 @@ function setDiff(diff) {
     $('#diff-hard').css({'border': '', 'border-color':''});
     $('#diff-easy').css({'border': '3px solid', 'border-color':'yellow'});
   }
-  else if (diff == 'normal') {
+  else if (diff == 'hard') {
     $('#diff-normal').css({'border': '', 'border-color':''});
     $('#diff-easy').css({'border': '', 'border-color':''});
     $('#diff-hard').css({'border': '3px solid', 'border-color':'yellow'});
   }
   else {
     $('#diff-easy').css({'border': '', 'border-color':''});
-    $('#diff-hard').css({'border': '3px solid', 'border-color':'yellow'});
-    $('#diff-normal').css({'border': '', 'border-color':''});
+    $('#diff-normal').css({'border': '3px solid', 'border-color':'yellow'});
+    $('#diff-hard').css({'border': '', 'border-color':''});
   }
 }
 
@@ -563,19 +550,37 @@ function showTutorial() {
 }
 
 function showSplash() {
-  LEVEL = 1; FINAL_SCORE = 0; SCORE = 0; setCovidDanger();
+  console.log("Volume" + volLev);
+  dieau.volume = volLev/100;
+  collectau.volume = volLev/100;
   $('.tutorial').hide();
   $('.landing-page').hide();
   $('#actual_game').show().css('display', 'flex');
   $('.splashScreen').show();
   $('.splashScreen').delay(3000).fadeOut('slow');
   $('#covid_level').text(LEVEL);
-  $('#covid_danger_num').text(COVID_DANGER);
   $('#score_num').text('0');
-
-  $('#vol-score').text(volLev);
+  if (diffLevel === 'easy') {
+    spawnRate= 1000;
+    diffIdx = 1;
+    COVID_DANGER = 10;
+  }
+  else if (diffLevel === 'normal') {
+    spawnRate = 800;
+    diffIdx = 3;
+    COVID_DANGER = 20;
+  }
+  else {
+    spawnRate = 600;
+    diffIdx = 5;
+    COVID_DANGER = 30;
+  }
+  $('#covid_danger_num').text(COVID_DANGER);
 
   setTimeout(startGame, 3000);
+  if (GAME_OVER === true) {
+    return;
+  }
 }
 
 function startOver() {
@@ -583,4 +588,12 @@ function startOver() {
   $('.landing-page').show();
   $('.landing-button').show();
   $('.game-over-page').css('display', 'none');
+  LEVEL = 1; SCORE = 0; COVID_SPEED = 1;
+}
+
+function setVolume() {
+  var slider = document.getElementById("vol-range");
+  var output = document.getElementById("setVol");
+  output.innerHTML = slider.value;
+  volLev = slider.value;
 }

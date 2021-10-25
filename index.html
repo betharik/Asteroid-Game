@@ -46,19 +46,10 @@
         <div class="settings-popup">
           <div class='settings-info'>
             <div>Settings</div>
-            <div> Volume: <span id="setVol"></span>
+            <div> Volume: <span id="setVol">50</span>
               <div class="volume-slide">
-                <input type="range" min="1" max="100" value="50" class="slider" id="vol-range">
+                <input type="range" min="1" max="100" value="50" class="slider" id="vol-range" oninput="setVolume()">
               </div>
-              <script>
-                var slider = document.getElementById("vol-range");
-                var output = document.getElementById("setVol");
-                volLev = slider.value;
-                output.innerHTML = slider.value;
-                slider.oninput = function() {
-                  output.innerHTML = this.value;
-                }
-              </script>
             </div>
             <div> Difficulty </br>
               <div class='difficulty-levels'>
@@ -112,11 +103,10 @@
               </div>
               <div id="covid_danger">COVID DANGER
               <div id="covid_danger_num"></div> </div>
+              
               <div id="level">LEVEL
-              <div id="covid_level"></div> </div>
-
-              <div> VOLUME </div> </br>
-              <div id='vol-score'> </div> 
+                <div id="covid_level"></div> 
+              </div> 
 
           </div> <!--end game right section-->
           <div class="asteroidSection">
