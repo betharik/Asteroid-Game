@@ -1,1 +1,2 @@
-# EECS493HW2
+# Asteroid Game
+- covid themed
